@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // import useNavigate
+import { useNavigate } from "react-router-dom";
 import { FaHome, FaFootballBall, FaQuestionCircle, FaGift, FaUserCog } from "react-icons/fa";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
 import { TbNumber21Small } from "react-icons/tb";
@@ -12,7 +12,7 @@ import { FaCircleNotch } from "react-icons/fa";
 import { GiOpenTreasureChest } from "react-icons/gi";
 
 const Sidebar = ({ isExpanded, toggleSidebar }) => {
-  const navigate = useNavigate(); // useNavigate hook
+  const navigate = useNavigate();
   const [expandedGroups, setExpandedGroups] = useState({
     games: false,
     wallet: false,
