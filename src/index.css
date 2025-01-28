@@ -1071,4 +1071,40 @@ footer {
   transition: all 0.3s ease-in-out;
 }
 
+button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-color: #1ffdb0;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  border: 2px solid #1ffdb0;
+  box-shadow: 0 0 10px rgba(31, 253, 176, 0.8);
+}
+
+button.hit:hover {
+  border: 2px solid #ff5733;
+  box-shadow: 0 0 10px rgba(255, 87, 51, 0.8);
+}
+
+button.split:hover {
+  border: 2px solid #f1c40f;
+  box-shadow: 0 0 10px rgba(241, 196, 15, 0.8);
+}
+
+button.double:hover {
+  border: 2px solid #3498db;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
+}
+
+button.stand:hover {
+  border: 2px solid #e74c3c;
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.8);
+}
+
 

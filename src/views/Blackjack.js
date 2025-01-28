@@ -1,275 +1,236 @@
-import React, { useState, useEffect } from "react";
-// I have zero fucking idea what im doing here... l0l
-const suits = ["hearts", "diamonds", "clubs", "spades"];
-const ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
-
-const generateDeck = () => suits.flatMap((suit) =>
-  ranks.map((rank) => ({
-    suit,
-    rank,
-    value: rank === "A" ? 11 : rank.match(/[JQK]/) ? 10 : parseInt(rank),
-  }))
-);
-
-const shuffleDeck = (deck) => [...deck].sort(() => Math.random() - 0.5);
-
-const calculateHandValue = (hand) => {
-  let value = hand.reduce((sum, card) => sum + card.value, 0);
-  let aces = hand.filter((card) => card.rank === "A").length;
-
-  while (value > 21 && aces > 0) {
-    value -= 10;
-    aces--;
-  }
-
-  return value;
-};
+import React, { useState } from "react";
+import "tailwindcss/tailwind.css";
 
 const Blackjack = () => {
-  const [deck, setDeck] = useState(shuffleDeck(generateDeck()));
   const [playerHand, setPlayerHand] = useState([]);
   const [dealerHand, setDealerHand] = useState([]);
+  const [splitHand, setSplitHand] = useState(null);
   const [bet, setBet] = useState(0);
   const [sideBets, setSideBets] = useState({ perfectPairs: 0, twentyOnePlusThree: 0 });
-  const [gameState, setGameState] = useState("betting");
-  const [gameMessage, setGameMessage] = useState("");
-  const [dealerRevealed, setDealerRevealed] = useState(false);
+  const [gameStatus, setGameStatus] = useState("");
+  const [playerTurn, setPlayerTurn] = useState(true);
+  const [deck, setDeck] = useState([]);
+
+  const initializeDeck = () => {
+    const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
+    const cards = suits.flatMap(suit => Array.from({ length: 13 }, (_, i) => ({ suit, value: i + 1 })));
+    setDeck(cards.sort(() => Math.random() - 0.5));
+  };
+
+  const calculateHandValue = (hand) => {
+    let value = hand.reduce((sum, card) => sum + Math.min(card.value, 10), 0);
+    const hasAce = hand.some(card => card.value === 1);
+    if (hasAce && value + 10 <= 21) value += 10;
+    return value;
+  };
 
   const dealInitialCards = () => {
-    setPlayerHand([deck.pop(), deck.pop()]);
-    setDealerHand([deck.pop(), deck.pop()]);
-    setGameState("playing");
-    setGameMessage("Dealing cards...");
+    initializeDeck();
+    const newDeck = [...deck];
+    setPlayerHand([newDeck.pop(), newDeck.pop()]);
+    setDealerHand([newDeck.pop(), newDeck.pop()]);
+    setGameStatus("");
+    setPlayerTurn(true);
+    setDeck(newDeck);
+    checkSideBets();
+  };
 
-    setTimeout(() => {
-      setGameMessage("Player's Turn");
-    }, 1500);
+  const checkSideBets = () => {
+    if (playerHand.length < 2) return;
+  
+    const [card1, card2] = playerHand;
+    if (card1.value === card2.value && card1.suit === card2.suit) {
+      setSideBets(prev => ({ ...prev, perfectPairs: bet * 25 }));
+    }
+  
+    const sortedHand = [card1, card2].sort((a, b) => a.value - b.value);
+    if (
+      sortedHand[0].value + 1 === sortedHand[1].value &&
+      (sortedHand[0].suit === sortedHand[1].suit || sortedHand[0].value === 1)
+    ) {
+      setSideBets(prev => ({ ...prev, twentyOnePlusThree: bet * 5 }));
+    }
   };
 
   const hit = () => {
-    const newHand = [...playerHand, deck.pop()];
-    setPlayerHand(newHand);
-
-    if (calculateHandValue(newHand) > 21) {
-      setGameMessage("Player Busts! You Lose.");
-      setGameState("bust");
-    } else {
-      setGameMessage("Player Hits");
+    if (!playerTurn) return;
+    const newDeck = [...deck];
+    const newCard = newDeck.pop();
+    setPlayerHand([...playerHand, newCard]);
+    setDeck(newDeck);
+    if (calculateHandValue([...playerHand, newCard]) > 21) {
+      setGameStatus("Bust! Dealer Wins.");
+      setPlayerTurn(false);
     }
   };
 
-  const stand = async () => {
-    setGameMessage("Player Stands");
-    let dealerValue = calculateHandValue(dealerHand);
-    const newDealerHand = [...dealerHand];
-    setDealerRevealed(true);  // Reveal the dealer's second card
-
-    while (dealerValue < 17) {
-      setGameMessage("Dealer Hits");
-      newDealerHand.push(deck.pop());
-      dealerValue = calculateHandValue(newDealerHand);
-      setDealerHand(newDealerHand);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-
-    setDealerHand(newDealerHand);
-    setGameMessage("Dealer Stands");
-
-    setTimeout(() => {
-      setGameState("result");
-    }, 1000);
+  const stand = () => {
+    setPlayerTurn(false);
+    dealerPlay();
   };
 
-  const double = async () => {
-    const newHand = [...playerHand, deck.pop()];
-    setPlayerHand(newHand);
-    setBet(bet * 2);
-
-    if (calculateHandValue(newHand) > 21) {
-      setGameMessage("Player Busts! You Lose.");
-      setGameState("bust");
-    } else {
-      setGameMessage("Player Doubles");
-      await stand();
+  const doubleDown = () => {
+    if (playerTurn && playerHand.length === 2) {
+      setBet(bet * 2);
+      hit();
+      if (gameStatus === "") stand();
     }
   };
 
   const split = () => {
-    if (playerHand.length === 2 && playerHand[0].rank === playerHand[1].rank) {
-      const newDeck = [...deck];
-      const newPlayerHand1 = [playerHand[0], newDeck.pop()];
-      const newPlayerHand2 = [playerHand[1], newDeck.pop()];
-      setPlayerHand(newPlayerHand1);
-      setDeck(newDeck);
-      setGameState("playing");
-      setGameMessage("Player Splits");
+    if (playerHand.length === 2 && playerHand[0].value === playerHand[1].value) {
+      setSplitHand([playerHand.pop()]);
     }
   };
 
-  const nextRound = () => {
-    setDeck(shuffleDeck(generateDeck()));
-    setPlayerHand([]);
-    setDealerHand([]);
-    setSideBets({ perfectPairs: 0, twentyOnePlusThree: 0 });
-    setGameState("betting");
-    setGameMessage("");
-    setDealerRevealed(false);  // Hide dealer's second card for next round
+  const dealerPlay = () => {
+    let dealerValue = calculateHandValue(dealerHand);
+    const newDeck = [...deck];
+    while (dealerValue < 17) {
+      dealerHand.push(newDeck.pop());
+      dealerValue = calculateHandValue(dealerHand);
+    }
+    setDeck(newDeck);
+    determineWinner();
   };
 
-  const handleBetPlacement = (amount) => {
-    setBet(amount);
-  };
-
-  const handleSideBetPlacement = (sideBet, amount) => {
-    setSideBets({ ...sideBets, [sideBet]: amount });
-  };
-
-  const getResult = () => {
+  const determineWinner = () => {
     const playerValue = calculateHandValue(playerHand);
     const dealerValue = calculateHandValue(dealerHand);
-
-    if (playerValue > 21) return "bust";
-    if (playerValue === dealerValue) return "push";
-    if (playerValue > dealerValue && playerValue <= 21) return "win";
-    return "lose";
+    if (dealerValue > 21 || playerValue > dealerValue) {
+      setGameStatus(`Player Wins! Winnings: $${bet + sideBets.perfectPairs + sideBets.twentyOnePlusThree}`);
+    } else if (playerValue < dealerValue) {
+      setGameStatus("Dealer Wins!");
+    } else {
+      setGameStatus("Push (Tie).");
+    }
   };
 
-  useEffect(() => {
-    if (gameState === "result") {
-      const result = getResult();
-      setGameMessage(result === "win" ? "You Win!" : result === "lose" ? "You Lose!" : "Push!");
-    }
-  }, [gameState]);
+  const resetGame = () => {
+    setPlayerHand([]);
+    setDealerHand([]);
+    setSplitHand(null);
+    setBet(0);
+    setSideBets({ perfectPairs: 0, twentyOnePlusThree: 0 });
+    setGameStatus("");
+    setPlayerTurn(true);
+    initializeDeck();
+  };
+
+  const CustomButton = ({ onClick, children, className, disabled }) => (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`px-4 py-2 rounded text-white ${className} ${
+        disabled ? "opacity-50 cursor-not-allowed" : ""
+      }`}
+    >
+      {children}
+    </button>
+  );
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-900 py-8">
-      <div className="flex w-full max-w-4xl bg-gray-800 rounded-xl p-6">
-        <div className="betbar w-1/3 p-4 bg-gray-800 rounded-lg mr-4">
-          <h2 className="text-3xl font-bold text-center text-gradient">Blackjack</h2>
-
-          {gameState === "betting" && (
-            <div className="mt-6">
-              <p className="text-lg mb-4">Place your main bet:</p>
-              <input
-                type="number"
-                className="p-2 mb-4 rounded-lg bg-gray-600 text-white"
-                value={bet}
-                onChange={(e) => setBet(e.target.value)}
-                placeholder="Enter Bet Amount"
-              />
-
-              <p className="text-lg mb-4">Place side bets:</p>
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center">
-                  <input
-                    type="number"
-                    className="p-2 mb-4 rounded-lg bg-gray-600 text-white w-20"
-                    value={sideBets.perfectPairs}
-                    onChange={(e) => handleSideBetPlacement("perfectPairs", e.target.value)}
-                    placeholder="Perfect Pairs"
-                  />
-                  <span className="ml-2 text-white">Perfect Pairs</span>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="number"
-                    className="p-2 mb-4 rounded-lg bg-gray-600 text-white w-20"
-                    value={sideBets.twentyOnePlusThree}
-                    onChange={(e) => handleSideBetPlacement("twentyOnePlusThree", e.target.value)}
-                    placeholder="21+3"
-                  />
-                  <span className="ml-2 text-white">21+3</span>
-                </div>
-              </div>
-
-              <div className="mt-4 flex justify-between gap-4">
-                <button
-                  className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg shadow-md hover:shadow-xl transition"
-                  onClick={dealInitialCards}
-                >
-                  Deal
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="game w-2/3 p-4 rounded-lg">
-          {gameState === "playing" && (
-            <div className="mt-6">
-              <div className="flex justify-between">
-                <div>
-                  <p className="text-xl">Player Hand: {calculateHandValue(playerHand)}</p>
-                  <div className="flex gap-2">
-                    {playerHand.map((card, idx) => (
-                      <div key={idx} className="w-16 h-24 bg-white text-center rounded shadow-lg flex items-center justify-center">
-                        <p>{card.rank} of {card.suit}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-xl">Dealer Hand: {calculateHandValue(dealerHand)}</p>
-                  <div className="flex gap-2">
-                    <div className="w-16 h-24 bg-white text-center rounded shadow-lg flex items-center justify-center">
-                      <p>{dealerHand[0].rank} of {dealerHand[0].suit}</p>
-                    </div>
-                    {dealerRevealed && (
-                      <div className="w-16 h-24 bg-white text-center rounded shadow-lg flex items-center justify-center">
-                        <p>{dealerHand[1].rank} of {dealerHand[1].suit}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <button
-                    onClick={hit}
-                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-lime-500 text-white rounded-lg shadow-md hover:shadow-xl transition"
-                  >
-                    Hit
-                  </button>
-
-                  <button
-                    onClick={stand}
-                    className="px-4 py-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-lg shadow-md hover:shadow-xl transition"
-                  >
-                    Stand
-                  </button>
-
-                  <button
-                    onClick={double}
-                    className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg shadow-md hover:shadow-xl transition"
-                  >
-                    Double
-                  </button>
-
-                  <button
-                    onClick={split}
-                    className="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg shadow-md hover:shadow-xl transition"
-                  >
-                    Split
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="mt-4">
-            <p className="text-xl">{gameMessage}</p>
+    <div className="min-h-screen bg-[#181818] flex flex-col items-center p-4">
+      <div className="text-white text-3xl font-bold mb-4">Blackjack Game</div>
+      <div className="flex space-x-8">
+        <div className="bg-gray-800 p-4 rounded-lg w-1/4 text-white">
+          <div className="mb-4">
+            <label className="block mb-2">Enter Bet:</label>
+            <input
+              type="number"
+              value={bet}
+              onChange={(e) => setBet(Number(e.target.value))}
+              className="w-full p-2 rounded bg-gray-700 text-white"
+            />
           </div>
-
-          {(gameState === "result" || gameState === "bust") && (
-            <button
-              className="mt-6 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-700 text-white rounded-lg shadow-md hover:shadow-xl transition"
-              onClick={nextRound}
-            >
-              Next Round
-            </button>
-          )}
+          <div className="mb-4">
+            <label className="block mb-2">Perfect Pair Bet:</label>
+            <input
+              type="number"
+              value={sideBets?.perfectPairs || 0}
+              onChange={(e) => setSideBets(prev => ({ ...prev, perfectPairs: Number(e.target.value) }))}
+              className="w-full p-2 rounded bg-gray-700 text-white"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">21+3 Bet:</label>
+            <input
+              type="number"
+              value={sideBets?.twentyOnePlusThree || 0}
+              onChange={(e) => setSideBets(prev => ({ ...prev, twentyOnePlusThree: Number(e.target.value) }))}
+              className="w-full p-2 rounded bg-gray-700 text-white"
+            />
+          </div>
+          <CustomButton
+            onClick={dealInitialCards}
+            className="w-full bg-gray-600 hover:bg-gray-700"
+          >
+            Deal Cards
+          </CustomButton>
+        </div>
+        <div className="flex-1 bg-gray-900 p-4 rounded-lg">
+          <div className="mb-4">
+            <div className="text-white text-lg">Dealer's Hand</div>
+            <div className="text-white">
+              {dealerHand.map((card, index) => (
+                <span key={index}>
+                  {index === 0 || !playerTurn
+                    ? `${card.value} of ${card.suit}`
+                    : "[Hidden]"},
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="text-white text-lg">Player's Hand</div>
+            <div className="text-white">
+              {playerHand.map((card, index) => (
+                <span key={index}>
+                  {card.value} of {card.suit},
+                </span>
+              ))}
+            </div>
+            <div className="text-green-400 text-xl mt-2">
+              Hand Value: {calculateHandValue(playerHand)}
+            </div>
+          </div>
+        </div>
+        <div className="w-1/4 bg-gray-800 p-4 rounded-lg">
+          <CustomButton
+            onClick={hit}
+            disabled={!playerTurn}
+            className="w-full mb-2 bg-gray-600 hover:bg-gray-700"
+          >
+            Hit
+          </CustomButton>
+          <CustomButton
+            onClick={stand}
+            disabled={!playerTurn}
+            className="w-full mb-2 bg-gray-600 hover:bg-gray-700"
+          >
+            Stand
+          </CustomButton>
+          <CustomButton
+            onClick={doubleDown}
+            disabled={!playerTurn || playerHand.length !== 2}
+            className="w-full mb-2 bg-gray-600 hover:bg-gray-700"
+          >
+            Double Down
+          </CustomButton>
+          <CustomButton
+            onClick={split}
+            disabled={!playerTurn || playerHand[0]?.value !== playerHand[1]?.value}
+            className="w-full bg-gray-600 hover:bg-gray-700"
+          >
+            Split
+          </CustomButton>
+          <div className="mt-4 text-white">{gameStatus}</div>
+          <CustomButton
+            onClick={resetGame}
+            className="mt-4 w-full bg-red-600 hover:bg-red-700"
+          >
+            Reset Game
+          </CustomButton>
         </div>
       </div>
     </div>

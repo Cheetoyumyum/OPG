@@ -78,7 +78,7 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
 
         <div className="sidebar-btn-group">
           <div className="sidebar-btn-container">
-            <button className="sidebar-btn" onClick={() => navigate("/home")}>
+            <button className="sidebar-btn" onClick={() => navigate("/")}>
               <FaHome />
               {isExpanded && <span>Home</span>}
             </button>
