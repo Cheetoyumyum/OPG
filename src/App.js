@@ -8,6 +8,7 @@ import Home from './views/Home';
 import Games from './views/Games';
 import Settings from './views/Settings';
 import Transactions from './views/Transactions';
+import Blackjack from './views/Blackjack';
 
 const App = () => {
   const [isSidebarExpanded, setSidebarExpanded] = useState(true);
@@ -45,6 +46,8 @@ const App = () => {
             <Route path="/Transactions" element={<Transactions />} />
             <Route path="/Transactions/Deposits" element={<Transactions />} />
             <Route path="/Transactions/Withdrawals" element={<Transactions />} />
+
+            <Route path="/Games/Blackjack" element={<Blackjack />} />
           </Routes>
 
           <Footer />
