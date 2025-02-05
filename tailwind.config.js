@@ -9,6 +9,9 @@ module.exports = {
       colors: {
         primary: '#1ffdb0',
       },
+      fontFamily: {
+        bebas: ['Bebas Neue', 'cursive'],
+      },
     },
   },
   plugins: [],

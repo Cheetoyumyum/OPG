@@ -70,7 +70,6 @@ const Home = () => {
       <Games />
 
       <div className='live-bets-container'>
-        <h2 className='games-title'>Live Bets</h2>
         <LiveBets filter={betsFilter} setFilter={setBetsFilter} />
       </div>
     </div>

@@ -50,37 +50,40 @@ const LiveBets = ({ filter, setFilter }) => {
 
   return (
     <div className='p-6 bg-[#131a22] rounded-xl shadow-2xl'>
-      <div className='filters mb-6 flex gap-3 justify-center'>
-        <button
-          onClick={() => setFilter('All Bets')}
-          className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
-            filter === 'All Bets'
-              ? 'bg-[#1ffdb0] text-[#121212] shadow-lg shadow-[#1ffdb0]/20'
-              : 'bg-[#273f61]/25 text-white hover:bg-[#1ffdb0] hover:text-[#121212] hover:shadow-lg hover:shadow-[#1ffdb0]/20'
-          }`}
-        >
-          All Bets
-        </button>
-        <button
-          onClick={() => setFilter('High Rollers')}
-          className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
-            filter === 'High Rollers'
-              ? 'bg-[#1ffdb0] text-[#121212] shadow-lg shadow-[#1ffdb0]/20'
-              : 'bg-[#273f61]/25 text-white hover:bg-[#1ffdb0] hover:text-[#121212] hover:shadow-lg hover:shadow-[#1ffdb0]/20'
-          }`}
-        >
-          High Rollers
-        </button>
-        <button
-          onClick={() => setFilter('My Bets')}
-          className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
-            filter === 'My Bets'
-              ? 'bg-[#1ffdb0] text-[#121212] shadow-lg shadow-[#1ffdb0]/20'
-              : 'bg-[#273f61]/25 text-white hover:bg-[#1ffdb0] hover:text-[#121212] hover:shadow-lg hover:shadow-[#1ffdb0]/20'
-          }`}
-        >
-          My Bets
-        </button>
+      <div className='flex items-center justify-between mb-6'>
+        <h2 className='text-white text-xl font-bebas'>Live Bets</h2>
+        <div className='filters flex gap-3 justify-end'>
+          <button
+            onClick={() => setFilter('All Bets')}
+            className={`px-6 py-3 rounded-lg font-medium border transition-all duration-300 ${
+              filter === 'All Bets'
+                ? 'bg-[#1ffdb0] text-[#121212] shadow-lg shadow-[#1ffdb0]/20 border-[#1ffdb0]'
+                : 'border-[#1ffdb0] text-white hover:border-white'
+            }`}
+          >
+            All Bets
+          </button>
+          <button
+            onClick={() => setFilter('High Rollers')}
+            className={`px-6 py-3 rounded-lg font-medium border transition-all duration-300 ${
+              filter === 'High Rollers'
+                ? 'bg-[#1ffdb0] text-[#121212] shadow-lg shadow-[#1ffdb0]/20 border-[#1ffdb0]'
+                : 'border-[#1ffdb0] text-white hover:border-white'
+            }`}
+          >
+            High Rollers
+          </button>
+          <button
+            onClick={() => setFilter('My Bets')}
+            className={`px-6 py-3 rounded-lg font-medium border transition-all duration-300 ${
+              filter === 'My Bets'
+                ? 'bg-[#1ffdb0] text-[#121212] shadow-lg shadow-[#1ffdb0]/20 border-[#1ffdb0]'
+                : 'border-[#1ffdb0] text-white hover:border-white'
+            }`}
+          >
+            My Bets
+          </button>
+        </div>
       </div>
       <div className='bet-list flex flex-col gap-[0px]'>
         <div className='header font-bold bg-[#131a22]/50 text-white p-4 grid grid-cols-6 items-center text-center'>

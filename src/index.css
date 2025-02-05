@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import '@fontsource/bebas-neue';
 
 * {
   margin: 0;
@@ -1083,9 +1084,8 @@ button {
   cursor: pointer;
   transition: all 0.3s ease;
 }
-
+/* IDK. i need to make unique classes for buttons. this is an issue. lol */
 button:hover {
-  border: 2px solid #1ffdb0;
   box-shadow: 0 0 10px rgba(31, 253, 176, 0.8);
 }
 

@@ -9,10 +9,10 @@ const Games = () => {
   const navigate = useNavigate();
   const games = [
     {
-      name: 'Waifu Tower',
-      image: '/games/waifu-tower.webp',
+      name: 'Slayer Tower',
+      image: '/games/Slayer-tower.webp',
       color: 'bg-purple-500',
-      route: 'waifu-tower',
+      route: 'Slayer tower',
     },
     {
       name: 'Plinko',
@@ -51,10 +51,10 @@ const Games = () => {
       route: 'blackjack',
     },
     {
-      name: 'Waifu Tower',
-      image: '/games/waifu-tower.webp',
+      name: 'Slayer Tower',
+      image: '/games/Slayer-tower.webp',
       color: 'bg-purple-500',
-      route: 'waifu-tower',
+      route: 'Slayer tower',
     },
     {
       name: 'Plinko',
