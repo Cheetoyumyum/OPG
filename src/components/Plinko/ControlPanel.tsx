@@ -8,7 +8,7 @@ import {
 } from "../../constants/game";
 import { FaInfinity, FaGear, FaChartLine, FaQuestion } from "react-icons/fa6";
 
-const Sidebar: React.FC = () => {
+const ControlPanel: React.FC = () => {
   const { state, setBetAmount, setRiskLevel, setRowCount } = useGame();
   const [betMode, setBetMode] = useState<BetMode>(BetMode.MANUAL);
   const [autoBetInput, setAutoBetInput] = useState(0);
@@ -90,16 +90,16 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-5 bg-slate-700 p-3 lg:max-w-80">
+    <div className="flex flex-col gap-5 bg-[#131a22] p-5 lg:max-w-80 rounded-xl shadow-2xl">
       {/* Bet Mode Toggle */}
-      <div className="flex gap-1 rounded-full bg-slate-900 p-1">
+      <div className="flex gap-1 rounded-full bg-[#273f61]/50 p-1">
         {betModes.map(({ value, label }) => (
           <button
             key={value}
             disabled={autoBetInterval !== null}
             onClick={() => setBetMode(value)}
-            className={`flex-1 rounded-full py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:bg-slate-600 active:[&:not(:disabled)]:bg-slate-500 ${
-              betMode === value ? "bg-slate-600" : ""
+            className={`flex-1 rounded-full py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:bg-[#1ffdb0] hover:[&:not(:disabled)]:text-[#131a22] ${
+              betMode === value ? "bg-[#1ffdb0] text-[#131a22]" : ""
             }`}
           >
             {label}
@@ -111,7 +111,7 @@ const Sidebar: React.FC = () => {
       <div className="relative">
         <label
           htmlFor="betAmount"
-          className="text-sm font-medium text-slate-300"
+          className="text-sm font-medium text-[#1ffdb0]"
         >
           Bet Amount
         </label>
@@ -126,13 +126,13 @@ const Sidebar: React.FC = () => {
               min="0"
               step="0.01"
               inputMode="decimal"
-              className={`w-full rounded-l-md border-2 border-slate-600 bg-slate-900 py-2 pl-7 pr-2 text-sm text-white transition-colors hover:cursor-pointer focus:border-slate-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:border-slate-500 ${
+              className={`w-full rounded-l-md border-2 border-[#273f61] bg-[#0f1728] py-2 pl-7 pr-2 text-sm text-white transition-colors hover:cursor-pointer focus:border-[#1ffdb0] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:border-[#1ffdb0] ${
                 (isBetAmountNegative || isBetExceedBalance) &&
                 "border-red-500 focus:border-red-400 hover:[&:not(:disabled)]:border-red-400"
               }`}
             />
             <div
-              className="absolute left-3 top-2 select-none text-slate-500"
+              className="absolute left-3 top-2 select-none text-[#1ffdb0]"
               aria-hidden="true"
             >
               $
@@ -143,7 +143,7 @@ const Sidebar: React.FC = () => {
             onClick={() =>
               setBetAmount(parseFloat((state.betAmount / 2).toFixed(2)))
             }
-            className="touch-manipulation bg-slate-600 px-4 font-bold diagonal-fractions text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:bg-slate-500 active:[&:not(:disabled)]:bg-slate-400"
+            className="touch-manipulation bg-[#273f61] px-4 font-bold diagonal-fractions text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:bg-[#1ffdb0] hover:[&:not(:disabled)]:text-[#131a22]"
           >
             1/2
           </button>
@@ -152,7 +152,7 @@ const Sidebar: React.FC = () => {
             onClick={() =>
               setBetAmount(parseFloat((state.betAmount * 2).toFixed(2)))
             }
-            className="relative touch-manipulation rounded-r-md bg-slate-600 px-4 text-sm font-bold text-white transition-colors after:absolute after:left-0 after:inline-block after:h-1/2 after:w-[2px] after:bg-slate-800 after:content-[''] disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:bg-slate-500 active:[&:not(:disabled)]:bg-slate-400"
+            className="relative touch-manipulation rounded-r-md bg-[#273f61] px-4 text-sm font-bold text-white transition-colors after:absolute after:left-0 after:inline-block after:h-1/2 after:w-[2px] after:bg-[#0f1728] after:content-[''] disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:bg-[#1ffdb0] hover:[&:not(:disabled)]:text-[#131a22]"
           >
             2×
           </button>
@@ -173,7 +173,7 @@ const Sidebar: React.FC = () => {
       <div>
         <label
           htmlFor="riskLevel"
-          className="text-sm font-medium text-slate-300"
+          className="text-sm font-medium text-[#1ffdb0]"
         >
           Risk
         </label>
@@ -182,7 +182,7 @@ const Sidebar: React.FC = () => {
           value={state.riskLevel}
           onChange={(e) => setRiskLevel(e.target.value as RiskLevel)}
           disabled={hasOutstandingBalls || autoBetInterval !== null}
-          className="w-full rounded-md border-2 border-slate-600 bg-slate-900 p-2 text-sm text-white transition-colors hover:cursor-pointer focus:border-slate-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:border-slate-500"
+          className="w-full rounded-md border-2 border-[#273f61] bg-[#0f1728] p-2 text-sm text-white transition-colors hover:cursor-pointer focus:border-[#1ffdb0] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:border-[#1ffdb0]"
         >
           {riskLevels.map(({ value, label }) => (
             <option key={value} value={value}>
@@ -196,7 +196,7 @@ const Sidebar: React.FC = () => {
       <div>
         <label
           htmlFor="rowCount"
-          className="text-sm font-medium text-slate-300"
+          className="text-sm font-medium text-[#1ffdb0]"
         >
           Rows
         </label>
@@ -205,7 +205,7 @@ const Sidebar: React.FC = () => {
           value={state.rowCount}
           onChange={(e) => setRowCount(parseInt(e.target.value) as RowCount)}
           disabled={hasOutstandingBalls || autoBetInterval !== null}
-          className="w-full rounded-md border-2 border-slate-600 bg-slate-900 p-2 text-sm text-white transition-colors hover:cursor-pointer focus:border-slate-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:border-slate-500"
+          className="w-full rounded-md border-2 border-[#273f61] bg-[#0f1728] p-2 text-sm text-white transition-colors hover:cursor-pointer focus:border-[#1ffdb0] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:border-[#1ffdb0]"
         >
           {rowCountOptions.map((value) => (
             <option key={value} value={value}>
@@ -218,9 +218,10 @@ const Sidebar: React.FC = () => {
       <button
         onClick={handleBetClick}
         disabled={isDropBallDisabled}
-        className={`touch-manipulation rounded-md bg-green-500 py-3 font-semibold text-slate-900 transition-colors hover:bg-green-400 active:bg-green-600 disabled:bg-neutral-600 disabled:text-neutral-400 ${
-          autoBetInterval !== null &&
-          "bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600"
+        className={`touch-manipulation rounded-md py-3 font-semibold transition-colors ${
+          autoBetInterval !== null
+            ? "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894]"
+            : "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894] disabled:bg-neutral-600 disabled:text-neutral-400"
         }`}
       >
         {betMode === BetMode.MANUAL
@@ -233,4 +234,4 @@ const Sidebar: React.FC = () => {
   );
 };
 
-export default Sidebar;
+export default ControlPanel;

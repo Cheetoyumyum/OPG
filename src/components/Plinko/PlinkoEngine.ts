@@ -43,15 +43,15 @@ class PlinkoEngine {
   private static ballFrictions: BallFrictionsByRowCount = {
     friction: 0.5,
     frictionAirByRowCount: {
-      8: 0.0395,
-      9: 0.041,
-      10: 0.038,
-      11: 0.0355,
-      12: 0.0414,
-      13: 0.0437,
-      14: 0.0401,
-      15: 0.0418,
-      16: 0.0364,
+      8: 0.0195,
+      9: 0.021,
+      10: 0.019,
+      11: 0.0175,
+      12: 0.0214,
+      13: 0.0237,
+      14: 0.0201,
+      15: 0.0218,
+      16: 0.0164,
     },
   };
 
@@ -70,7 +70,7 @@ class PlinkoEngine {
     this.riskLevel = initialState.riskLevel;
 
     this.engine = Matter.Engine.create({
-      timing: { timeScale: 1 },
+      timing: { timeScale: 1.5 },
     });
 
     this.render = Matter.Render.create({
