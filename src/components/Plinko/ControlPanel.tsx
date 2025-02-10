@@ -90,7 +90,7 @@ const ControlPanel: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-5 bg-[#131a22] p-5 lg:max-w-80 rounded-xl shadow-2xl">
+    <div className="flex flex-col gap-5 bg-background p-5 lg:max-w-80 rounded-xl shadow-2xl">
       {/* Bet Mode Toggle */}
       <div className="flex gap-1 rounded-full bg-[#273f61]/50 p-1">
         {betModes.map(({ value, label }) => (

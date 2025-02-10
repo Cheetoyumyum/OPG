@@ -33,10 +33,10 @@ const Plinko: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="mx-auto flex flex-col" style={{ width: `${WIDTH}px` }}>
         <div
-          className="relative w-full bg-[#0f1728] rounded-lg overflow-hidden"
+          className="relative w-full bg-background rounded-lg overflow-hidden"
           style={{ height: `${HEIGHT}px` }}
         >
           {!state.plinkoEngine && (
