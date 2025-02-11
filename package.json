@@ -4,6 +4,7 @@
   "homepage": "https://cheetoyumyum.github.io",
   "private": true,
   "dependencies": {
+    "@auth0/auth0-react": "^2.3.0",
     "@fontsource/bebas-neue": "^5.1.1",
     "@fontsource/dotgothic16": "^5.1.1",
     "@types/matter-js": "^0.19.8",

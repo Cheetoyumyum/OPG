@@ -290,7 +290,7 @@ body::after {
 }
 
 
-.login-btn, .register-btn, .chat-toggle-btn {
+.login-btn, .register-btn, .chat-toggle-btn, .logout-btn {
   background-color: #1a1a1a;
   color: #1ffdb0;
   padding: 8px 12px;
