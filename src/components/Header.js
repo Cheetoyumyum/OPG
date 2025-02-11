@@ -29,10 +29,28 @@ const Header = ({ isChatOpen, toggleChat, isSidebarOpen, toggleSidebar }) => {
         <div className="header-right">
           {!isAuthenticated ? (
             <>
-              <button className="login-btn" onClick={loginWithRedirect}>
+              <button
+                className="login-btn"
+                onClick={() =>
+                  loginWithRedirect({
+                    authorizationParams: {
+                      screen_hint: "login",
+                    },
+                  })
+                }
+              >
                 Login
               </button>
-              <button className="register-btn" onClick={loginWithRedirect}>
+              <button
+                className="register-btn"
+                onClick={() =>
+                  loginWithRedirect({
+                    authorizationParams: {
+                      screen_hint: "signup",
+                    },
+                  })
+                }
+              >
                 Register
               </button>
             </>
