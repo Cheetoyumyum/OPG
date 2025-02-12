@@ -1,7 +1,9 @@
 import { FaCommentDots, FaBars } from "react-icons/fa";
 import Wallet from "./Wallet";
-
+import { useAuth0 } from "@auth0/auth0-react";
 const Header = ({ isChatOpen, toggleChat, isSidebarOpen, toggleSidebar }) => {
+  const { isAuthenticated, isLoading, loginWithRedirect, logout } = useAuth0();
+
   return (
     <header className={`header ${isSidebarOpen || isChatOpen ? "shrink" : ""}`}>
       <div className="header-left">
@@ -19,14 +21,60 @@ const Header = ({ isChatOpen, toggleChat, isSidebarOpen, toggleSidebar }) => {
       </div>
 
       <Wallet />
-
-      <div className="header-right">
-        <button className="login-btn">Login</button>
-        <button className="register-btn">Register</button>
-        <button onClick={toggleChat} className="chat-toggle-btn">
-          <FaCommentDots />
-        </button>
-      </div>
+      {isLoading ? (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+        </div>
+      ) : (
+        <div className="header-right">
+          {!isAuthenticated ? (
+            <>
+              <button
+                className="login-btn"
+                onClick={() =>
+                  loginWithRedirect({
+                    authorizationParams: {
+                      screen_hint: "login",
+                    },
+                  })
+                }
+              >
+                Login
+              </button>
+              <button
+                className="register-btn"
+                onClick={() =>
+                  loginWithRedirect({
+                    authorizationParams: {
+                      screen_hint: "signup",
+                    },
+                  })
+                }
+              >
+                Register
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className="logout-btn"
+                onClick={() =>
+                  logout({
+                    logoutParams: {
+                      returnTo: window.location.origin,
+                    },
+                  })
+                }
+              >
+                Logout
+              </button>
+            </>
+          )}
+          <button onClick={toggleChat} className="chat-toggle-btn">
+            <FaCommentDots />
+          </button>
+        </div>
+      )}
     </header>
   );
 };
