@@ -11,18 +11,28 @@ const Plinko: React.FC = () => {
   const engineRef = useRef<PlinkoEngine | null>(null);
 
   useEffect(() => {
-    if (canvasRef.current && !engineRef.current) {
-      engineRef.current = new PlinkoEngine(
-        canvasRef.current,
-        {
+    if (canvasRef.current) {
+      if (!engineRef.current) {
+        // Initialize engine if it doesn't exist
+        engineRef.current = new PlinkoEngine(
+          canvasRef.current,
+          {
+            betAmount: state.betAmount,
+            rowCount: state.rowCount,
+            riskLevel: state.riskLevel,
+          },
+          addWinRecord
+        );
+        engineRef.current.start();
+        setPlinkoEngine(engineRef.current);
+      } else {
+        // Update existing engine if state changes
+        engineRef.current.updateGameState({
           betAmount: state.betAmount,
           rowCount: state.rowCount,
           riskLevel: state.riskLevel,
-        },
-        addWinRecord
-      );
-      engineRef.current.start();
-      setPlinkoEngine(engineRef.current);
+        });
+      }
 
       return () => {
         engineRef.current?.stop();
@@ -30,11 +40,14 @@ const Plinko: React.FC = () => {
         setPlinkoEngine(null);
       };
     }
-  }, []);
+  }, [state.rowCount, state.riskLevel, state.betAmount]);
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8">
-      <div className="mx-auto flex flex-col" style={{ width: `${WIDTH}px` }}>
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-900 py-4 lg:py-8">
+      <div
+        className="mx-auto flex flex-col w-full lg:w-auto"
+        style={{ maxWidth: `${WIDTH}px` }}
+      >
         <div
           className="relative w-full bg-[#0f1728] rounded-lg overflow-hidden"
           style={{ height: `${HEIGHT}px` }}
@@ -57,7 +70,7 @@ const Plinko: React.FC = () => {
           <BinsRow engine={state.plinkoEngine} />
         </div>
       </div>
-      <div className="absolute right-[5%] top-1/2 -translate-y-1/2">
+      <div className="hidden lg:block absolute right-[5%] top-1/2 -translate-y-1/2">
         <LastWins />
       </div>
     </div>

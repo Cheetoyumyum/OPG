@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Chat from "./components/Chat";
 import Footer from "./components/Footer";
+import NavBar from "./components/NavBar";
 import Home from "./views/Home";
 import Games from "./views/Games";
 import Settings from "./views/Settings";
@@ -14,55 +15,85 @@ import Plinko from "./views/Plinko";
 const App = () => {
   const [isSidebarExpanded, setSidebarExpanded] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
-    if (isChatOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-  }, [isChatOpen]);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+      if (window.innerWidth <= 768) {
+        setSidebarExpanded(false);
+        setIsChatOpen(false);
+      }
+    };
 
-  const toggleSidebar = () => setSidebarExpanded(!isSidebarExpanded);
-  const toggleChat = () => setIsChatOpen(!isChatOpen);
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Initial check
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const toggleSidebar = () => {
+    if (!isMobile) {
+      setSidebarExpanded(!isSidebarExpanded);
+    }
+  };
+
+  const toggleChat = () => {
+    if (!isMobile) {
+      setIsChatOpen(!isChatOpen);
+    }
+  };
 
   return (
     <Router>
-      <div className="layout">
-        <Sidebar isExpanded={isSidebarExpanded} toggleSidebar={toggleSidebar} />
+      <div className="layout bg-[#181818] min-h-screen">
+        {/* Only show sidebar on desktop */}
+        <div className="hidden lg:block">
+          <Sidebar
+            isExpanded={isSidebarExpanded}
+            toggleSidebar={toggleSidebar}
+          />
+        </div>
 
         <div
-          className={`main-content ${isSidebarExpanded ? "shrink-left" : ""} ${
-            isChatOpen ? "shrink-right" : ""
-          }`}
+          className={`main-content flex flex-col min-h-screen transition-all duration-300 ${
+            isSidebarExpanded && !isMobile ? "lg:ml-[250px]" : ""
+          } ${isChatOpen && !isMobile ? "lg:mr-[300px]" : ""}`}
         >
           <Header
             isChatOpen={isChatOpen}
             toggleChat={toggleChat}
             isSidebarOpen={isSidebarExpanded}
             toggleSidebar={toggleSidebar}
+            isMobile={isMobile}
           />
 
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/Games" element={<Games />} />
-            <Route path="/Games/:gameName" element={<Games />} />
-            <Route path="/Settings" element={<Settings />} />
-            <Route path="/Transactions" element={<Transactions />} />
-            <Route path="/Transactions/Deposits" element={<Transactions />} />
-            <Route
-              path="/Transactions/Withdrawals"
-              element={<Transactions />}
-            />
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/games" element={<Games />} />
+              <Route path="/games/:gameName" element={<Games />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/transactions/deposits" element={<Transactions />} />
+              <Route
+                path="/transactions/withdrawals"
+                element={<Transactions />}
+              />
 
-            <Route path="/Games/Blackjack" element={<Blackjack />} />
-            <Route path="/Games/Plinko" element={<Plinko />} />
-          </Routes>
+              <Route path="/games/blackjack" element={<Blackjack />} />
+              <Route path="/games/plinko" element={<Plinko />} />
+            </Routes>
+          </main>
 
+          {/* Footer will always be at the bottom */}
           <Footer />
+
+          {/* Only show mobile navigation on mobile */}
+          {isMobile && <NavBar />}
         </div>
 
-        <Chat isOpen={isChatOpen} />
+        {/* Only show chat on desktop */}
+        {!isMobile && <Chat isOpen={isChatOpen} />}
       </div>
     </Router>
   );
