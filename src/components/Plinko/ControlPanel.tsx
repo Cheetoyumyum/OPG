@@ -91,6 +91,25 @@ const ControlPanel: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-5 bg-[#131a22] p-5 lg:max-w-80 rounded-xl shadow-2xl">
+      {/* Drop Ball Button - Mobile Only */}
+      <div className="lg:hidden">
+        <button
+          onClick={handleBetClick}
+          disabled={isDropBallDisabled}
+          className={`w-full touch-manipulation rounded-md py-3 font-semibold transition-colors ${
+            autoBetInterval !== null
+              ? "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894]"
+              : "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894] disabled:bg-neutral-600 disabled:text-neutral-400"
+          }`}
+        >
+          {betMode === BetMode.MANUAL
+            ? "Bet"
+            : autoBetInterval === null
+            ? "Start Autobet"
+            : "Stop Autobet"}
+        </button>
+      </div>
+
       {/* Bet Mode Toggle */}
       <div className="flex gap-1 rounded-full bg-[#273f61]/50 p-1">
         {betModes.map(({ value, label }) => (
@@ -223,21 +242,24 @@ const ControlPanel: React.FC = () => {
         </div>
       )}
 
-      <button
-        onClick={handleBetClick}
-        disabled={isDropBallDisabled}
-        className={`touch-manipulation rounded-md py-3 font-semibold transition-colors ${
-          autoBetInterval !== null
-            ? "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894]"
-            : "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894] disabled:bg-neutral-600 disabled:text-neutral-400"
-        }`}
-      >
-        {betMode === BetMode.MANUAL
-          ? "Drop Ball"
-          : autoBetInterval === null
-          ? "Start Autobet"
-          : "Stop Autobet"}
-      </button>
+      {/* Drop Ball Button - Desktop Only */}
+      <div className="hidden lg:block">
+        <button
+          onClick={handleBetClick}
+          disabled={isDropBallDisabled}
+          className={`w-full touch-manipulation rounded-md py-3 font-semibold transition-colors ${
+            autoBetInterval !== null
+              ? "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894]"
+              : "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894] disabled:bg-neutral-600 disabled:text-neutral-400"
+          }`}
+        >
+          {betMode === BetMode.MANUAL
+            ? "Bet"
+            : autoBetInterval === null
+            ? "Start Autobet"
+            : "Stop Autobet"}
+        </button>
+      </div>
     </div>
   );
 };

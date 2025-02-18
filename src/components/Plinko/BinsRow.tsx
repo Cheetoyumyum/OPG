@@ -57,27 +57,24 @@ const BinsRow: React.FC<BinsRowProps> = ({ engine }) => {
   if (!plinkoEngine) return null;
 
   return (
-    <div className="flex h-[clamp(10px,0.352px+2.609vw,16px)] w-full justify-center lg:h-7">
+    <div className="flex h-auto w-full justify-center">
       <div
-        className="flex gap-[1%]"
+        className="flex gap-[1px]"
         style={{ width: `${(plinkoEngine.binsWidthPercentage ?? 0) * 100}%` }}
       >
         {binPayouts[rowCount][riskLevel].map((payout, binIndex) => (
           <div
             key={binIndex}
             ref={(node) => initAnimation(node, binIndex)}
-            className="flex min-w-0 flex-1 items-center justify-center rounded-sm text-[clamp(6px,2.784px+0.87vw,8px)] font-bold text-gray-950 shadow-[0_2px_var(--shadow-color)] lg:rounded-md lg:text-[clamp(10px,-16.944px+2.632vw,12px)] lg:shadow-[0_3px_var(--shadow-color)]"
-            style={
-              {
-                backgroundColor:
-                  binColorsByRowCount[rowCount].background[binIndex],
-                "--shadow-color":
-                  binColorsByRowCount[rowCount].shadow[binIndex],
-              } as React.CSSProperties
-            }
+            className="relative flex min-w-0 flex-1 items-center justify-center py-2 text-xs font-bold text-gray-950 sm:text-sm"
+            style={{
+              backgroundColor: state.binColors.background[binIndex],
+            }}
           >
-            {payout}
-            {payout < 100 ? "×" : ""}
+            <div className="flex items-baseline">
+              {payout}
+              {payout < 100 && <span className="ml-0.5 text-[0.7em]">×</span>}
+            </div>
           </div>
         ))}
       </div>
