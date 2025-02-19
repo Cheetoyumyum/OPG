@@ -1,10 +1,14 @@
 import { IoTrophyOutline } from "react-icons/io5";
 import { MdSportsBaseball } from "react-icons/md";
 import { RiChat1Line, RiMenuLine, RiSearchLine } from "react-icons/ri";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
-const NavBar = () => {
-  const navigate = useNavigate();
+const NavBar = ({
+  toggleSidebar,
+  toggleChat,
+  isSidebarExpanded,
+  isChatOpen,
+}) => {
   const location = useLocation();
 
   const isActive = (path) => location.pathname === path;
@@ -13,17 +17,17 @@ const NavBar = () => {
     <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#1E1E1E] border-t border-gray-800 z-50">
       <div className="flex justify-between items-center px-4 py-2">
         <button
-          onClick={() => navigate("/")}
+          onClick={toggleSidebar}
           className="flex flex-col items-center space-y-1 flex-1"
         >
           <RiMenuLine
             className={`text-2xl ${
-              isActive("/") ? "text-[#1ffdb0]" : "text-gray-400"
+              isSidebarExpanded ? "text-[#1ffdb0]" : "text-gray-400"
             }`}
           />
           <span
             className={`text-xs ${
-              isActive("/") ? "text-[#1ffdb0]" : "text-gray-400"
+              isSidebarExpanded ? "text-[#1ffdb0]" : "text-gray-400"
             }`}
           >
             Menu
@@ -31,35 +35,25 @@ const NavBar = () => {
         </button>
 
         <button
-          onClick={() => navigate("/search")}
+          onClick={() => {}} // Search functionality
           className="flex flex-col items-center space-y-1 flex-1"
         >
-          <RiSearchLine
-            className={`text-2xl ${
-              isActive("/search") ? "text-[#1ffdb0]" : "text-gray-400"
-            }`}
-          />
-          <span
-            className={`text-xs ${
-              isActive("/search") ? "text-[#1ffdb0]" : "text-gray-400"
-            }`}
-          >
-            Search
-          </span>
+          <RiSearchLine className="text-2xl text-gray-400" />
+          <span className="text-xs text-gray-400">Search</span>
         </button>
 
         <button
-          onClick={() => navigate("/chat")}
+          onClick={toggleChat}
           className="flex flex-col items-center space-y-1 flex-1"
         >
           <RiChat1Line
             className={`text-2xl ${
-              isActive("/chat") ? "text-[#1ffdb0]" : "text-gray-400"
+              isChatOpen ? "text-[#1ffdb0]" : "text-gray-400"
             }`}
           />
           <span
             className={`text-xs ${
-              isActive("/chat") ? "text-[#1ffdb0]" : "text-gray-400"
+              isChatOpen ? "text-[#1ffdb0]" : "text-gray-400"
             }`}
           >
             Chat
@@ -67,7 +61,7 @@ const NavBar = () => {
         </button>
 
         <button
-          onClick={() => navigate("/rewards")}
+          onClick={() => {}}
           className="flex flex-col items-center space-y-1 flex-1"
         >
           <IoTrophyOutline
@@ -85,7 +79,7 @@ const NavBar = () => {
         </button>
 
         <button
-          onClick={() => navigate("/sports")}
+          onClick={() => {}}
           className="flex flex-col items-center space-y-1 flex-1"
         >
           <MdSportsBaseball
