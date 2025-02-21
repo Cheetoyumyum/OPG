@@ -1,6 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaHome, FaFootballBall, FaQuestionCircle, FaGift, FaUserCog } from "react-icons/fa";
+import {
+  FaHome,
+  FaFootballBall,
+  FaQuestionCircle,
+  FaGift,
+  FaUserCog,
+} from "react-icons/fa";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
 import { TbNumber21Small } from "react-icons/tb";
 import { LuFlower2 } from "react-icons/lu";
@@ -21,6 +27,13 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
   });
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleGroup = (group) => {
     setExpandedGroups((prev) => ({
@@ -33,28 +46,43 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
     setSearchQuery(e.target.value);
   };
 
+  const handleNavigation = (path) => {
+    navigate(path);
+    if (isMobile) {
+      toggleSidebar();
+    }
+  };
+
   const filteredGames = [
     { name: "Blackjack", icon: <TbNumber21Small /> },
     { name: "Flower Poker", icon: <LuFlower2 /> },
     { name: "Limbo", icon: <LiaMeteorSolid /> },
     { name: "Plinko", icon: <GiUnlitBomb /> },
-  ].filter((game) => game.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  ].filter((game) =>
+    game.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const filteredWallet = [
     { name: "Deposit", icon: <GrMoney /> },
     { name: "Withdraw", icon: <GiUnlitBomb /> },
     { name: "Transfer", icon: <TbPigMoney /> },
-  ].filter((wallet) => wallet.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  ].filter((wallet) =>
+    wallet.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const filteredRewards = [
     { name: "Rakeback", icon: <FaGift /> },
     { name: "Redeem Code", icon: <FaGift /> },
-  ].filter((reward) => reward.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  ].filter((reward) =>
+    reward.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const filteredFeatures = [
     { name: "Settings", icon: <FaUserCog /> },
     { name: "Stats", icon: <FaCircleNotch /> },
-  ].filter((feature) => feature.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  ].filter((feature) =>
+    feature.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className={`sidebar ${isExpanded ? "expanded" : ""}`}>
@@ -78,13 +106,19 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
 
         <div className="sidebar-btn-group">
           <div className="sidebar-btn-container">
-            <button className="sidebar-btn" onClick={() => navigate("/")}>
+            <button
+              className="sidebar-btn"
+              onClick={() => handleNavigation("/")}
+            >
               <FaHome />
               {isExpanded && <span>Home</span>}
             </button>
           </div>
           <div className="sidebar-btn-container">
-            <button className="sidebar-btn" onClick={() => navigate("/sports")}>
+            <button
+              className="sidebar-btn"
+              onClick={() => handleNavigation("/sports")}
+            >
               <FaFootballBall />
               {isExpanded && <span>Sports</span>}
             </button>
@@ -98,15 +132,23 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
           >
             <span>Games</span>
             {isExpanded && (
-              <span>{expandedGroups.games ? <HiChevronUp /> : <HiChevronDown />}</span>
+              <span>
+                {expandedGroups.games ? <HiChevronUp /> : <HiChevronDown />}
+              </span>
             )}
           </div>
-          <div className={`group-content ${expandedGroups.games ? "expanded" : "hidden"}`}>
+          <div
+            className={`group-content ${
+              expandedGroups.games ? "expanded" : "hidden"
+            }`}
+          >
             {filteredGames.map((game) => (
               <div className="sidebar-btn-container" key={game.name}>
                 <button
                   className="sidebar-btn"
-                  onClick={() => navigate(`/games/${game.name.toLowerCase()}`)}
+                  onClick={() =>
+                    handleNavigation(`/games/${game.name.toLowerCase()}`)
+                  }
                 >
                   {game.icon}
                   {isExpanded && <span>{game.name}</span>}
@@ -123,15 +165,23 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
           >
             <span>Wallet</span>
             {isExpanded && (
-              <span>{expandedGroups.wallet ? <HiChevronUp /> : <HiChevronDown />}</span>
+              <span>
+                {expandedGroups.wallet ? <HiChevronUp /> : <HiChevronDown />}
+              </span>
             )}
           </div>
-          <div className={`group-content ${expandedGroups.wallet ? "expanded" : "hidden"}`}>
+          <div
+            className={`group-content ${
+              expandedGroups.wallet ? "expanded" : "hidden"
+            }`}
+          >
             {filteredWallet.map((wallet) => (
               <div className="sidebar-btn-container" key={wallet.name}>
                 <button
                   className="sidebar-btn"
-                  onClick={() => navigate(`/wallet/${wallet.name.toLowerCase()}`)}
+                  onClick={() =>
+                    handleNavigation(`/wallet/${wallet.name.toLowerCase()}`)
+                  }
                 >
                   {wallet.icon}
                   {isExpanded && <span>{wallet.name}</span>}
@@ -148,15 +198,23 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
           >
             <span>Rewards</span>
             {isExpanded && (
-              <span>{expandedGroups.rewards ? <HiChevronUp /> : <HiChevronDown />}</span>
+              <span>
+                {expandedGroups.rewards ? <HiChevronUp /> : <HiChevronDown />}
+              </span>
             )}
           </div>
-          <div className={`group-content ${expandedGroups.rewards ? "expanded" : "hidden"}`}>
+          <div
+            className={`group-content ${
+              expandedGroups.rewards ? "expanded" : "hidden"
+            }`}
+          >
             {filteredRewards.map((reward) => (
               <div className="sidebar-btn-container" key={reward.name}>
                 <button
                   className="sidebar-btn"
-                  onClick={() => navigate(`/rewards/${reward.name.toLowerCase()}`)}
+                  onClick={() =>
+                    handleNavigation(`/rewards/${reward.name.toLowerCase()}`)
+                  }
                 >
                   {reward.icon}
                   {isExpanded && <span>{reward.name}</span>}
@@ -173,15 +231,23 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
           >
             <span>Features</span>
             {isExpanded && (
-              <span>{expandedGroups.features ? <HiChevronUp /> : <HiChevronDown />}</span>
+              <span>
+                {expandedGroups.features ? <HiChevronUp /> : <HiChevronDown />}
+              </span>
             )}
           </div>
-          <div className={`group-content ${expandedGroups.features ? "expanded" : "hidden"}`}>
+          <div
+            className={`group-content ${
+              expandedGroups.features ? "expanded" : "hidden"
+            }`}
+          >
             {filteredFeatures.map((feature) => (
               <div className="sidebar-btn-container" key={feature.name}>
                 <button
                   className="sidebar-btn"
-                  onClick={() => navigate(`/features/${feature.name.toLowerCase()}`)}
+                  onClick={() =>
+                    handleNavigation(`/features/${feature.name.toLowerCase()}`)
+                  }
                 >
                   {feature.icon}
                   {isExpanded && <span>{feature.name}</span>}
@@ -192,7 +258,10 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
         </div>
 
         <div className="sidebar-btn-container">
-          <button className="sidebar-btn" onClick={() => navigate("/support")}>
+          <button
+            className="sidebar-btn"
+            onClick={() => handleNavigation("/support")}
+          >
             <FaQuestionCircle />
             {isExpanded && <span>Support</span>}
           </button>

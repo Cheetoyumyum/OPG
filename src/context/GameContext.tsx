@@ -29,7 +29,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     plinkoEngine: null,
     betAmount: 1,
     betAmountOfExistingBalls: {},
-    rowCount: 16,
+    rowCount: 8,
     riskLevel: RiskLevel.MEDIUM,
     winRecords: [],
     totalProfitHistory: [0],

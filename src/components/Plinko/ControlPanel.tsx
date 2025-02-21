@@ -91,6 +91,25 @@ const ControlPanel: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-5 bg-[#131a22] p-5 lg:max-w-80 rounded-xl shadow-2xl">
+      {/* Drop Ball Button - Mobile Only */}
+      <div className="lg:hidden">
+        <button
+          onClick={handleBetClick}
+          disabled={isDropBallDisabled}
+          className={`w-full touch-manipulation rounded-md py-3 font-semibold transition-colors ${
+            autoBetInterval !== null
+              ? "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894]"
+              : "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894] disabled:bg-neutral-600 disabled:text-neutral-400"
+          }`}
+        >
+          {betMode === BetMode.MANUAL
+            ? "Bet"
+            : autoBetInterval === null
+            ? "Start Autobet"
+            : "Stop Autobet"}
+        </button>
+      </div>
+
       {/* Bet Mode Toggle */}
       <div className="flex gap-1 rounded-full bg-[#273f61]/50 p-1">
         {betModes.map(({ value, label }) => (
@@ -169,67 +188,78 @@ const ControlPanel: React.FC = () => {
         )}
       </div>
 
-      {/* Risk Level Select */}
-      <div>
-        <label
-          htmlFor="riskLevel"
-          className="text-sm font-medium text-[#1ffdb0]"
-        >
-          Risk
-        </label>
-        <select
-          id="riskLevel"
-          value={state.riskLevel}
-          onChange={(e) => setRiskLevel(e.target.value as RiskLevel)}
-          disabled={hasOutstandingBalls || autoBetInterval !== null}
-          className="w-full rounded-md border-2 border-[#273f61] bg-[#0f1728] p-2 text-sm text-white transition-colors hover:cursor-pointer focus:border-[#1ffdb0] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:border-[#1ffdb0]"
-        >
+      {/* Risk Level */}
+      <div className="space-y-2">
+        <label className="text-base text-white">Risk</label>
+        <div className="grid grid-cols-3 gap-2">
           {riskLevels.map(({ value, label }) => (
-            <option key={value} value={value}>
+            <button
+              key={value}
+              onClick={() => setRiskLevel(value)}
+              disabled={hasOutstandingBalls || autoBetInterval !== null}
+              className={`rounded-lg py-3 text-base transition-colors ${
+                state.riskLevel === value
+                  ? "bg-[#1ffdb0] text-[#131a22]"
+                  : "bg-[#0f1728] text-white hover:bg-[#1ffdb0] hover:text-[#131a22]"
+              }`}
+            >
               {label}
-            </option>
+            </button>
           ))}
-        </select>
+        </div>
       </div>
 
-      {/* Row Count Select */}
-      <div>
-        <label
-          htmlFor="rowCount"
-          className="text-sm font-medium text-[#1ffdb0]"
-        >
-          Rows
-        </label>
-        <select
-          id="rowCount"
+      {/* Rows */}
+      <div className="space-y-2">
+        <label className="text-base text-white">Rows</label>
+        <div className="text-start text-base text-white">{state.rowCount}</div>
+        <input
+          type="range"
+          min="8"
+          max="16"
           value={state.rowCount}
           onChange={(e) => setRowCount(parseInt(e.target.value) as RowCount)}
           disabled={hasOutstandingBalls || autoBetInterval !== null}
-          className="w-full rounded-md border-2 border-[#273f61] bg-[#0f1728] p-2 text-sm text-white transition-colors hover:cursor-pointer focus:border-[#1ffdb0] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:border-[#1ffdb0]"
-        >
-          {rowCountOptions.map((value) => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
-        </select>
+          className="w-full cursor-pointer rounded-lg bg-[#0f1728] accent-[#1ffdb0]"
+        />
       </div>
 
-      <button
-        onClick={handleBetClick}
-        disabled={isDropBallDisabled}
-        className={`touch-manipulation rounded-md py-3 font-semibold transition-colors ${
-          autoBetInterval !== null
-            ? "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894]"
-            : "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894] disabled:bg-neutral-600 disabled:text-neutral-400"
-        }`}
-      >
-        {betMode === BetMode.MANUAL
-          ? "Drop Ball"
-          : autoBetInterval === null
-          ? "Start Autobet"
-          : "Stop Autobet"}
-      </button>
+      {betMode === BetMode.AUTO && (
+        <div className="space-y-2">
+          <label className="text-base text-white">Number of Bets</label>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              value={autoBetInput}
+              onChange={(e) => setAutoBetInput(Number(e.target.value))}
+              min="0"
+              className="flex-1 rounded-lg bg-[#0f1728] py-3 px-4 text-lg text-white"
+            />
+            <button className="rounded-lg bg-[#273f61] p-3">
+              <FaInfinity className="text-xl text-white" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Drop Ball Button - Desktop Only */}
+      <div className="hidden lg:block">
+        <button
+          onClick={handleBetClick}
+          disabled={isDropBallDisabled}
+          className={`w-full touch-manipulation rounded-md py-3 font-semibold transition-colors ${
+            autoBetInterval !== null
+              ? "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894]"
+              : "bg-[#1ffdb0] text-[#131a22] hover:bg-[#1ae69f] active:bg-[#1cd894] disabled:bg-neutral-600 disabled:text-neutral-400"
+          }`}
+        >
+          {betMode === BetMode.MANUAL
+            ? "Bet"
+            : autoBetInterval === null
+            ? "Start Autobet"
+            : "Stop Autobet"}
+        </button>
+      </div>
     </div>
   );
 };
