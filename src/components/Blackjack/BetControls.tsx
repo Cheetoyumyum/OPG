@@ -117,14 +117,16 @@ const BetControls: React.FC<BetControlsProps> = ({
         </button>
       </div>
 
-      {activeBetType === "standard" ? (
-        <BetInput
-          value={betAmount}
-          onChange={handleInputChange(setBetAmount)}
-          label="Bet Amount"
-          disabled={isGameActive}
-        />
-      ) : (
+      {/* Main Bet Input */}
+      <BetInput
+        value={betAmount}
+        onChange={handleInputChange(setBetAmount)}
+        label="Bet Amount"
+        disabled={isGameActive}
+      />
+
+      {/* Side Bets Inputs */}
+      {activeBetType === "side" && (
         <>
           <BetInput
             value={perfectPairsBet}

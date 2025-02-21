@@ -28,6 +28,7 @@ const Blackjack = () => {
     dealerScore: 0,
     hideSecondCard: true,
     isGameActive: false,
+    isSplit: false,
   });
   const [gameId, setGameId] = useState(0);
 
@@ -128,21 +129,17 @@ const Blackjack = () => {
 
   const handleHit = () => {
     const newCard = game.dealCard();
-    const newPlayerHand = [
-      ...gameState.playerHands[gameState.currentHandIndex].cards,
-      newCard,
-    ];
+    const currentHandIndex = gameState.currentHandIndex;
+    const currentHand = gameState.playerHands[currentHandIndex];
+    const newPlayerHand = [...currentHand.cards, newCard];
     const newPlayerScore = game.calculateHandValue(newPlayerHand);
-
-    const result =
-      newPlayerScore > 21
-        ? calculateResult(newPlayerScore, gameState.dealerScore)
-        : null;
-
-    setGameState((prev) => ({
-      ...prev,
-      playerHands: prev.playerHands.map((hand, index) =>
-        index === prev.currentHandIndex
+  
+    // Calculate result for the new score
+    const result = newPlayerScore > 21 ? calculateResult(newPlayerScore, gameState.dealerScore) : null;
+  
+    setGameState((prev) => {
+      const updatedHands = prev.playerHands.map((hand, index) =>
+        index === currentHandIndex
           ? {
               ...hand,
               cards: newPlayerHand,
@@ -151,16 +148,61 @@ const Blackjack = () => {
               payout: result?.payout || 0,
             }
           : hand
-      ),
-      isGameActive: newPlayerScore <= 21,
-    }));
-  };
+      );
+  
+      // Check if the player has busted
+      if (newPlayerScore > 21) {
+        // Move to the next hand if available
+        if (currentHandIndex < updatedHands.length - 1) {
+          return {
+            ...prev,
+            playerHands: updatedHands,
+            currentHandIndex: currentHandIndex + 1,
+            isGameActive: true, // Game is still active
+          };
+        } else {
+          // End game if all hands are done
+          return {
+            ...prev,
+            playerHands: updatedHands,
+            isGameActive: false,
+          };
+        }
+      }
+  
+      // Check for automatic stand on 21
+      if (newPlayerScore === 21) {
+        // Automatically stand and move to the next hand
+        if (currentHandIndex < updatedHands.length - 1) {
+          handleStand();
+          return {
+            ...prev,
+            currentHandIndex: currentHandIndex + 1, // Move to the next hand
+          };
+        }
+      }
+  
+      return {
+        ...prev,
+        playerHands: updatedHands,
+        isGameActive: newPlayerScore <= 21,
+      };
+    });
+  };  
+  
+  
 
   const canSplit = () => {
     const currentHand = gameState.playerHands[gameState.currentHandIndex];
+    const cardValues = currentHand.cards.map(card => card.value);
+
+    const isTenValueCards = cardValues.every(
+      value => value === "10" || value === "J" || value === "Q" || value === "K"
+    );
+
     return (
       currentHand.cards.length === 2 &&
-      currentHand.cards[0].value === currentHand.cards[1].value &&
+      (currentHand.cards[0].value === currentHand.cards[1].value || isTenValueCards) &&
       gameState.playerHands.length < 2 &&
       betAmount > 0
     );
@@ -192,29 +234,30 @@ const Blackjack = () => {
       ...prev,
       playerHands: newHands,
       currentHandIndex: 0,
+      isSplit: true,
     }));
   };
 
   const handleStand = () => {
+    // If there are multiple hands, check if we need to move to the next hand
     if (gameState.currentHandIndex < gameState.playerHands.length - 1) {
-      // Move to next split hand
       setGameState((prev) => ({
         ...prev,
-        currentHandIndex: prev.currentHandIndex + 1,
+        currentHandIndex: prev.currentHandIndex + 1, // Move to the next hand
       }));
       return;
     }
-
+  
     // Final stand - dealer's turn
     let currentDealerHand = [...gameState.dealerHand];
     let currentDealerScore = game.calculateHandValue(currentDealerHand);
-
+  
     while (currentDealerScore < 17) {
       const newCard = game.dealCard();
       currentDealerHand.push(newCard);
       currentDealerScore = game.calculateHandValue(currentDealerHand);
     }
-
+  
     // Calculate results for all hands
     const updatedHands = gameState.playerHands.map((hand) => {
       const result = calculateResult(hand.score, currentDealerScore);
@@ -225,7 +268,7 @@ const Blackjack = () => {
         payout: result.payout * multiplier,
       };
     });
-
+  
     setGameState((prev) => ({
       ...prev,
       playerHands: updatedHands,
@@ -235,7 +278,7 @@ const Blackjack = () => {
       hideSecondCard: false,
     }));
   };
-
+  
   const canDouble = () => {
     const currentHand = gameState.playerHands[gameState.currentHandIndex];
     return (

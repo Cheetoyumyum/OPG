@@ -32,16 +32,18 @@ export class BlackjackGame {
     "K",
   ];
 
-  constructor() {
+  constructor(private numberOfDecks: number = 6) {
     this.initializeDeck();
   }
 
   private initializeDeck(): void {
     this.deck = [];
-    for (const suit of this.suits) {
-      for (const value of this.values) {
-        const numericValue = this.getNumericValue(value);
-        this.deck.push({ suit, value, numericValue });
+    for (let d = 0; d < this.numberOfDecks; d++) {
+      for (const suit of this.suits) {
+        for (const value of this.values) {
+          const numericValue = this.getNumericValue(value);
+          this.deck.push({ suit, value, numericValue });
+        }
       }
     }
     this.shuffle();

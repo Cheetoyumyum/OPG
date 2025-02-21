@@ -79,7 +79,7 @@ const Card: React.FC<CardProps> = ({
         initial={{ rotateY: 0 }}
         animate={{ rotateY: 180 }}
         transition={{
-          duration: 0.6,
+          duration: 0.3,
           delay: 0.5 + index * 0.2, // Start flipping after dealing animation + stagger
         }}
       >
@@ -98,7 +98,7 @@ const Card: React.FC<CardProps> = ({
         initial={{ rotateY: -180 }}
         animate={{ rotateY: 0 }}
         transition={{
-          duration: 0.6,
+          duration: 0.3,
           delay: 0.5 + index * 0.2, // Start flipping after dealing animation + stagger
         }}
       >

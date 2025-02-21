@@ -12,6 +12,7 @@ interface PlayerHandProps {
   pairPayout?: number;
   isSmall?: boolean;
   gameId: number;
+  isActive?: boolean; // Add isActive prop
 }
 
 const PlayerHand: React.FC<PlayerHandProps> = ({
@@ -21,6 +22,7 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
   pairPayout,
   isSmall = false,
   gameId,
+  isActive = false, // Default to false
 }) => {
   const getPairTypeText = () => {
     if (!pairType) return null;
@@ -37,7 +39,7 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
   };
 
   return (
-    <div className="relative">
+    <div className={`relative ${isActive ? 'border border-[rgb(13, 255, 182)] rounded-lg' : ''}`}>
       <div className="flex justify-center gap-2">
         {cards.map((card, index) => (
           <motion.div
