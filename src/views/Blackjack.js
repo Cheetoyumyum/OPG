@@ -8,6 +8,8 @@ const Blackjack = () => {
   const [game] = useState(new BlackjackGame());
   const [betAmount, setBetAmount] = useState(0);
   const [balance, setBalance] = useState(1000);
+  const [perfectPairsBet, setPerfectPairsBet] = useState(0);
+  const [twentyOnePlus3Bet, setTwentyOnePlus3Bet] = useState(0);
   const [gameState, setGameState] = useState({
     playerHands: [
       {
@@ -15,6 +17,10 @@ const Blackjack = () => {
         score: 0,
         result: null,
         payout: 0,
+        pairType: null,
+        pairPayout: 0,
+        twentyOnePlus3Hand: null,
+        twentyOnePlus3Payout: 0,
       },
     ],
     currentHandIndex: 0,
@@ -70,6 +76,9 @@ const Blackjack = () => {
   const startNewGame = () => {
     if (betAmount <= 0) return;
 
+    // Deduct bets from balance
+    const totalBet = betAmount + perfectPairsBet + twentyOnePlus3Bet;
+    setBalance((prev) => prev - totalBet);
     setGameId((prev) => prev + 1);
 
     const playerCards = [game.dealCard(), game.dealCard()];
@@ -79,6 +88,23 @@ const Blackjack = () => {
     const isBlackjack = game.isBlackjack(playerCards);
     const result = isBlackjack ? calculateResult(playerScore, 0, true) : null;
 
+    // Check for Perfect Pairs
+    const pairType = game.checkPairType(playerCards);
+    const pairPayout = game.calculatePairPayout(pairType, perfectPairsBet);
+
+    // Check for 21+3
+    const twentyOnePlus3Hand = game.check21Plus3(playerCards, dealerCards[0]);
+    const twentyOnePlus3Payout = game.calculate21Plus3Payout(
+      twentyOnePlus3Hand,
+      twentyOnePlus3Bet
+    );
+
+    // Update balance with side bet payouts
+    const totalSidePayout = pairPayout + twentyOnePlus3Payout;
+    if (totalSidePayout > 0) {
+      setBalance((prev) => prev + totalSidePayout);
+    }
+
     setGameState({
       playerHands: [
         {
@@ -86,6 +112,10 @@ const Blackjack = () => {
           score: playerScore,
           result: result?.result || null,
           payout: result?.payout || 0,
+          pairType,
+          pairPayout,
+          twentyOnePlus3Hand,
+          twentyOnePlus3Payout,
         },
       ],
       currentHandIndex: 0,
@@ -263,6 +293,10 @@ const Blackjack = () => {
             <BetControls
               betAmount={betAmount}
               setBetAmount={setBetAmount}
+              perfectPairsBet={perfectPairsBet}
+              setPerfectPairsBet={setPerfectPairsBet}
+              twentyOnePlus3Bet={twentyOnePlus3Bet}
+              setTwentyOnePlus3Bet={setTwentyOnePlus3Bet}
               isGameActive={gameState.isGameActive}
             />
           </div>

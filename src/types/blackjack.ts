@@ -1,10 +1,13 @@
 export type GameResult = "win" | "lose" | "push" | "blackjack" | null;
+export type PairType = "perfect" | "colored" | "mixed" | null;
 
 export interface HandState {
   cards: Array<{ suit: string; value: string }>;
   score: number;
   result: GameResult;
   payout: number;
+  pairType: PairType;
+  pairPayout: number;
 }
 
 export interface BlackjackState {
