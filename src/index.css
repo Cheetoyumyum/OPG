@@ -1064,4 +1064,32 @@ footer {
   display: none !important;
 }
 
+/* new mobile-specific styles */
+@media (max-width: 768px) {
+  .chat {
+    width: 70%;
+    height: calc(100% - 60px); /* Account for mobile nav */
+    bottom: 60px; /* Height of mobile nav */
+    top: auto;
+  }
+
+  .chat-messages {
+    flex: 1;
+    height: 0; /* Allow flex to control height */
+  }
+
+  .chat-input {
+    position: sticky;
+    bottom: 0;
+    background-color: rgb(19, 26, 34);
+    padding: 8px 12px;
+    border-top: 1px solid #2a2e38;
+    z-index: 31;
+  }
+  .sidebar {
+    width: 70%;
+    height: calc(100% - 60px);
+  }
+}
+
 
