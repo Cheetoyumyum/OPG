@@ -10,6 +10,7 @@ const Blackjack = () => {
   const [balance, setBalance] = useState(1000);
   const [perfectPairsBet, setPerfectPairsBet] = useState(0);
   const [twentyOnePlus3Bet, setTwentyOnePlus3Bet] = useState(0);
+  const [insuranceBet, setInsuranceBet] = useState(0);
   const [gameState, setGameState] = useState({
     playerHands: [
       {
@@ -29,6 +30,7 @@ const Blackjack = () => {
     hideSecondCard: true,
     isGameActive: false,
     isSplit: false,
+    showInsurance: false,
   });
   const [gameId, setGameId] = useState(0);
 
@@ -86,6 +88,9 @@ const Blackjack = () => {
     const dealerCards = [game.dealCard(), game.dealCard()];
     const playerScore = game.calculateHandValue(playerCards);
 
+    // Check if dealer's up card is an Ace
+    const showInsurance = dealerCards[0].value === "A";
+
     const isBlackjack = game.isBlackjack(playerCards);
     const result = isBlackjack ? calculateResult(playerScore, 0, true) : null;
 
@@ -124,6 +129,7 @@ const Blackjack = () => {
       dealerScore: game.calculateHandValue([dealerCards[0]]),
       hideSecondCard: true,
       isGameActive: !isBlackjack,
+      showInsurance,
     });
   };
 
@@ -133,10 +139,13 @@ const Blackjack = () => {
     const currentHand = gameState.playerHands[currentHandIndex];
     const newPlayerHand = [...currentHand.cards, newCard];
     const newPlayerScore = game.calculateHandValue(newPlayerHand);
-  
+
     // Calculate result for the new score
-    const result = newPlayerScore > 21 ? calculateResult(newPlayerScore, gameState.dealerScore) : null;
-  
+    const result =
+      newPlayerScore > 21
+        ? calculateResult(newPlayerScore, gameState.dealerScore)
+        : null;
+
     setGameState((prev) => {
       const updatedHands = prev.playerHands.map((hand, index) =>
         index === currentHandIndex
@@ -149,7 +158,7 @@ const Blackjack = () => {
             }
           : hand
       );
-  
+
       // Check if the player has busted
       if (newPlayerScore > 21) {
         // Move to the next hand if available
@@ -169,7 +178,7 @@ const Blackjack = () => {
           };
         }
       }
-  
+
       // Check for automatic stand on 21
       if (newPlayerScore === 21) {
         // Automatically stand and move to the next hand
@@ -181,28 +190,28 @@ const Blackjack = () => {
           };
         }
       }
-  
+
       return {
         ...prev,
         playerHands: updatedHands,
         isGameActive: newPlayerScore <= 21,
       };
     });
-  };  
-  
-  
+  };
 
   const canSplit = () => {
     const currentHand = gameState.playerHands[gameState.currentHandIndex];
-    const cardValues = currentHand.cards.map(card => card.value);
+    const cardValues = currentHand.cards.map((card) => card.value);
 
     const isTenValueCards = cardValues.every(
-      value => value === "10" || value === "J" || value === "Q" || value === "K"
+      (value) =>
+        value === "10" || value === "J" || value === "Q" || value === "K"
     );
 
     return (
       currentHand.cards.length === 2 &&
-      (currentHand.cards[0].value === currentHand.cards[1].value || isTenValueCards) &&
+      (currentHand.cards[0].value === currentHand.cards[1].value ||
+        isTenValueCards) &&
       gameState.playerHands.length < 2 &&
       betAmount > 0
     );
@@ -247,17 +256,17 @@ const Blackjack = () => {
       }));
       return;
     }
-  
+
     // Final stand - dealer's turn
     let currentDealerHand = [...gameState.dealerHand];
     let currentDealerScore = game.calculateHandValue(currentDealerHand);
-  
+
     while (currentDealerScore < 17) {
       const newCard = game.dealCard();
       currentDealerHand.push(newCard);
       currentDealerScore = game.calculateHandValue(currentDealerHand);
     }
-  
+
     // Calculate results for all hands
     const updatedHands = gameState.playerHands.map((hand) => {
       const result = calculateResult(hand.score, currentDealerScore);
@@ -268,7 +277,7 @@ const Blackjack = () => {
         payout: result.payout * multiplier,
       };
     });
-  
+
     setGameState((prev) => ({
       ...prev,
       playerHands: updatedHands,
@@ -278,7 +287,7 @@ const Blackjack = () => {
       hideSecondCard: false,
     }));
   };
-  
+
   const canDouble = () => {
     const currentHand = gameState.playerHands[gameState.currentHandIndex];
     return (
@@ -292,19 +301,16 @@ const Blackjack = () => {
   const handleDouble = () => {
     if (!canDouble()) return;
 
+    // Deduct additional bet amount from balance
+    setBalance((prev) => prev - betAmount);
+
     // Deal one more card
     const newCard = game.dealCard();
     const currentHand = gameState.playerHands[gameState.currentHandIndex];
     const newPlayerHand = [...currentHand.cards, newCard];
     const newPlayerScore = game.calculateHandValue(newPlayerHand);
 
-    // Calculate result if bust
-    const result =
-      newPlayerScore > 21
-        ? calculateResult(newPlayerScore, gameState.dealerScore)
-        : null;
-
-    // Update state with doubled bet
+    // Update state first
     setGameState((prev) => ({
       ...prev,
       playerHands: prev.playerHands.map((hand, index) =>
@@ -313,18 +319,64 @@ const Blackjack = () => {
               ...hand,
               cards: newPlayerHand,
               score: newPlayerScore,
-              result: result?.result || null,
-              payout: result ? result.payout * 2 : 0, // Double the payout
             }
           : hand
       ),
-      isGameActive: newPlayerScore <= 21,
+      isGameActive: true, // Keep game active until we process dealer's turn
     }));
 
-    // If not bust, automatically stand
+    // If not bust, handle dealer's turn
     if (newPlayerScore <= 21) {
-      handleStand();
+      // Use setTimeout to ensure state update has completed
+      setTimeout(() => {
+        handleStand();
+      }, 100);
+    } else {
+      // If bust, calculate result immediately
+      const result = calculateResult(newPlayerScore, gameState.dealerScore);
+      setGameState((prev) => ({
+        ...prev,
+        playerHands: prev.playerHands.map((hand, index) =>
+          index === prev.currentHandIndex
+            ? {
+                ...hand,
+                result: result.result,
+                payout: result.payout * 2, // Double the payout since it was a double down
+              }
+            : hand
+        ),
+        isGameActive: false,
+      }));
     }
+  };
+
+  const handleInsurance = () => {
+    const insuranceAmount = betAmount / 2;
+    setInsuranceBet(insuranceAmount);
+    setBalance((prev) => prev - insuranceAmount);
+
+    // Check if dealer has blackjack
+    const dealerHasBlackjack = game.isBlackjack(gameState.dealerHand);
+
+    if (dealerHasBlackjack) {
+      // Insurance pays 2:1
+      const insurancePayout = insuranceAmount * 2;
+      setBalance((prev) => prev + insurancePayout);
+    }
+
+    setGameState((prev) => ({
+      ...prev,
+      showInsurance: false,
+      hideSecondCard: false,
+      isGameActive: !dealerHasBlackjack,
+    }));
+  };
+
+  const declineInsurance = () => {
+    setGameState((prev) => ({
+      ...prev,
+      showInsurance: false,
+    }));
   };
 
   return (
@@ -350,6 +402,8 @@ const Blackjack = () => {
               onStand={handleStand}
               onDouble={handleDouble}
               onSplit={handleSplit}
+              onInsurance={handleInsurance}
+              onDeclineInsurance={declineInsurance}
               betAmount={betAmount}
               onBet={startNewGame}
               isGameActive={gameState.isGameActive}
@@ -361,7 +415,11 @@ const Blackjack = () => {
 
         {/* Right Column - Game Board (Desktop) / Top Game Board (Mobile) */}
         <div className="order-1 lg:order-2 flex-1 bg-[#131a22] p-6">
-          <GameBoard gameState={gameState} gameId={gameId} />
+          <GameBoard
+            gameState={gameState}
+            gameId={gameId}
+            insuranceBet={insuranceBet}
+          />
         </div>
       </div>
     </div>

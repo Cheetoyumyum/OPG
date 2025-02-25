@@ -39,7 +39,11 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
   };
 
   return (
-    <div className={`relative ${isActive ? 'border border-[rgb(13, 255, 182)] rounded-lg' : ''}`}>
+    <div
+      className={`relative ${
+        isActive ? "border border-[rgb(13, 255, 182)] rounded-lg" : ""
+      }`}
+    >
       <div className="flex justify-center gap-2">
         {cards.map((card, index) => (
           <motion.div
@@ -80,7 +84,7 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
           <div className="bg-[#1E2328] px-3 py-1 rounded-full text-sm">
             <span className="text-white">{getPairTypeText()}</span>
             {pairPayout && pairPayout > 0 && (
-              <span className="text-[#4ADE80] ml-2">
+              <span className="text-green-400 ml-2">
                 +{pairPayout.toFixed(8)} Ł
               </span>
             )}

@@ -40,11 +40,11 @@ const Card: React.FC<CardProps> = ({
     switch (result) {
       case "win":
       case "blackjack":
-        return "border-[#4ADE80]";
+        return "border-green-400";
       case "lose":
         return "border-red-500";
       case "push":
-        return "border-white/50";
+        return "border-orange-500";
       default:
         return "border-white/20";
     }
@@ -102,7 +102,9 @@ const Card: React.FC<CardProps> = ({
           delay: 0.5 + index * 0.2, // Start flipping after dealing animation + stagger
         }}
       >
-        <div className={`${fontSize} font-bold ${getSuitColor()}`}>
+        <div
+          className={`${fontSize} font-bold ${getSuitColor()} font-semibold`}
+        >
           {value === "10" ? (
             <div
               className={

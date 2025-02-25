@@ -7,9 +7,14 @@ import { motion, AnimatePresence } from "framer-motion";
 interface GameBoardProps {
   gameState: BlackjackState;
   gameId: number;
+  insuranceBet?: number;
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ gameState, gameId }) => {
+const GameBoard: React.FC<GameBoardProps> = ({
+  gameState,
+  gameId,
+  insuranceBet,
+}) => {
   // Calculate animation timing based on the last card's index
   const getAnimationDelay = (cardCount: number) => {
     const dealingDelay = (cardCount - 1) * 0.2; // Time for dealing animation
@@ -22,16 +27,17 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameState, gameId }) => {
   return (
     <div className="flex flex-col items-center">
       {/* Dealer Score */}
-      <div className="bg-[#1E2328] rounded-full text-center px-2 md:px-4 py-0.5 md:py-1 mb-2 md:mb-4">
-        <AnimatePresence>
+      <div className="bg-[#343843] rounded-full text-center px-2 md:px-4 mb-2 md:mb-4">
+        <AnimatePresence mode="wait">
           <motion.span
-            key={`dealer-score-${gameId}`}
+            key={`dealer-score-${gameId}-${gameState.dealerScore}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{
-              delay: getAnimationDelay(gameState.dealerHand.length),
+              delay: 0,
             }}
-            className="text-white text-base md:text-xl"
+            className="text-white text-base md:text-lg"
           >
             {gameState.dealerScore}
           </motion.span>
@@ -74,28 +80,47 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameState, gameId }) => {
               isSmall={gameState.playerHands.length > 1}
               gameId={gameId}
             />
-            <div className="flex justify-center mt-1 md:mt-2">
+
+            {/* Score and Insurance Indicator */}
+            <div className="flex flex-col items-center gap-2 mt-1 md:mt-2">
+              {/* Score */}
               <div
-                className={`min-w-10 md:min-w-14 text-center rounded-full px-2 md:px-4 py-0.5 md:py-1 ${
+                className={`min-w-10 md:min-w-14 text-center rounded-full px-2 md:px-4 mt-2 ${
                   hand.result === "win" || hand.result === "blackjack"
-                    ? "bg-[#4ADE80]"
+                    ? "bg-green-400"
                     : hand.result === "lose"
                     ? "bg-red-500"
+                    : hand.result === "push"
+                    ? "bg-orange-500"
                     : "bg-[#1E2328]"
                 }`}
               >
-                <AnimatePresence>
+                <AnimatePresence mode="wait">
                   <motion.span
-                    key={`player-score-${gameId}-${index}`}
+                    key={`player-score-${gameId}-${index}-${hand.score}`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: getAnimationDelay(hand.cards.length) }}
-                    className="text-white text-base md:text-xl"
+                    exit={{ opacity: 0 }}
+                    transition={{
+                      delay: 0,
+                    }}
+                    className="text-white text-base md:text-lg"
                   >
                     {hand.score}
                   </motion.span>
                 </AnimatePresence>
               </div>
+
+              {/* Insurance Indicator */}
+              {insuranceBet &&
+                insuranceBet > 0 &&
+                index === 0 &&
+                hand.result == "lose" && (
+                  <div className="flex items-center gap-2 bg-[#1E2328] rounded-full px-3 py-1 border border-green-400">
+                    <span className="text-green-400 text-sm">Insurance</span>
+                    <span className="text-white text-sm">2:1</span>
+                  </div>
+                )}
             </div>
           </div>
         ))}

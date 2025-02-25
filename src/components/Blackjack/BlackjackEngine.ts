@@ -7,6 +7,7 @@ export type Card = {
 export type PairType = "perfect" | "colored" | "mixed" | null;
 
 export type ThreeCardPokerHand =
+  | "suited-trips"
   | "straight-flush"
   | "three-of-a-kind"
   | "straight"
@@ -73,22 +74,18 @@ export class BlackjackGame {
     let sum = 0;
     let aces = 0;
 
-    // Count aces and sum non-ace cards first
+    // Sum all cards, counting aces as 11 initially
     for (const card of cards) {
+      sum += card.numericValue;
       if (card.value === "A") {
         aces += 1;
-      } else {
-        sum += card.numericValue;
       }
     }
 
-    // Add aces one at a time
-    for (let i = 0; i < aces; i++) {
-      if (sum + 11 <= 21) {
-        sum += 11;
-      } else {
-        sum += 1;
-      }
+    // Convert aces from 11 to 1 as needed to avoid busting
+    while (sum > 21 && aces > 0) {
+      sum -= 10; // Convert one ace from 11 to 1
+      aces -= 1;
     }
 
     return sum;
@@ -140,6 +137,16 @@ export class BlackjackGame {
 
     const threeCards = [...playerCards, dealerUpCard];
 
+    // Check for suited trips (same value and same suit)
+    if (
+      threeCards.every(
+        (card) =>
+          card.value === threeCards[0].value && card.suit === threeCards[0].suit
+      )
+    ) {
+      return "suited-trips";
+    }
+
     // Sort cards by value for easier straight detection
     const sortedValues = threeCards
       .map((card) => this.getNumericValue(card.value))
@@ -178,6 +185,8 @@ export class BlackjackGame {
     betAmount: number
   ): number {
     switch (hand) {
+      case "suited-trips":
+        return betAmount * 100;
       case "straight-flush":
         return betAmount * 40;
       case "three-of-a-kind":
@@ -189,5 +198,9 @@ export class BlackjackGame {
       default:
         return 0;
     }
+  }
+
+  public isPush(playerCard: Card, dealerCard: Card): boolean {
+    return playerCard.value === dealerCard.value;
   }
 }

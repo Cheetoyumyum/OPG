@@ -6,6 +6,8 @@ interface GameControlsProps {
   onStand: () => void;
   onDouble: () => void;
   onSplit: () => void;
+  onInsurance: () => void;
+  onDeclineInsurance: () => void;
   betAmount: number;
   onBet: () => void;
   isGameActive: boolean;
@@ -19,6 +21,8 @@ const GameControls: React.FC<GameControlsProps> = ({
   onStand,
   onDouble,
   onSplit,
+  onInsurance,
+  onDeclineInsurance,
   betAmount,
   onBet,
   isGameActive,
@@ -27,6 +31,29 @@ const GameControls: React.FC<GameControlsProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-4">
+      {/* Insurance Dialog */}
+      {gameState.showInsurance && (
+        <div className="bg-[#1E2328] p-4 rounded-lg">
+          <p className="text-white mb-4">
+            Dealer has an Ace. Would you like insurance?
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={onInsurance}
+              className="flex-1 bg-[#1ffdb0] text-[#131a22] py-2 rounded-md font-medium"
+            >
+              Yes
+            </button>
+            <button
+              onClick={onDeclineInsurance}
+              className="flex-1 bg-[#EF4444] text-white py-2 rounded-md font-medium"
+            >
+              No
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-2">
         <button
           onClick={onHit}
