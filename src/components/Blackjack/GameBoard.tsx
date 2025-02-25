@@ -79,6 +79,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
               result={hand.result}
               isSmall={gameState.playerHands.length > 1}
               gameId={gameId}
+              isActive={
+                gameState.playerHands.length > 1 &&
+                gameState.isGameActive &&
+                index === gameState.currentHandIndex
+              }
             />
 
             {/* Score and Insurance Indicator */}

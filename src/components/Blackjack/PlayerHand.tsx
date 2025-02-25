@@ -39,11 +39,14 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
   };
 
   return (
-    <div
-      className={`relative ${
-        isActive ? "border border-[rgb(13, 255, 182)] rounded-lg" : ""
-      }`}
-    >
+    <div className={"relative"}>
+      {/* Active Hand Indicator */}
+      {isActive && (
+        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
+          <div className="text-teal-300 text-3xl">▼</div>
+        </div>
+      )}
+
       <div className="flex justify-center gap-2">
         {cards.map((card, index) => (
           <motion.div
