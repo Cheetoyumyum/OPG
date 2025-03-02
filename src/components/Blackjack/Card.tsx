@@ -25,16 +25,16 @@ const Card: React.FC<CardProps> = ({
   };
 
   const getBorderColor = () => {
-    if (pairType) {
-      switch (pairType) {
-        case "perfect":
-          return "border-purple-500";
-        case "colored":
-          return "border-yellow-500";
-        case "mixed":
-          return "border-blue-500";
-      }
-    }
+    // if (pairType) {
+    //   switch (pairType) {
+    //     case "perfect":
+    //       return "border-purple-500";
+    //     case "colored":
+    //       return "border-yellow-500";
+    //     case "mixed":
+    //       return "border-blue-500";
+    //   }
+    // }
 
     if (!result) return "border-white/20";
     switch (result) {
