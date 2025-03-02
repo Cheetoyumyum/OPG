@@ -77,6 +77,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
             <PlayerHand
               cards={hand.cards}
               result={hand.result}
+              pairType={hand.pairType}
+              pairPayout={hand.pairPayout}
+              twentyOnePlus3Hand={hand.twentyOnePlus3Hand}
+              twentyOnePlus3Payout={hand.twentyOnePlus3Payout}
               isSmall={gameState.playerHands.length > 1}
               gameId={gameId}
               isActive={
@@ -126,6 +130,54 @@ const GameBoard: React.FC<GameBoardProps> = ({
                     <span className="text-white text-sm">2:1</span>
                   </div>
                 )}
+
+              {/* Pair Result Display */}
+              {hand.pairType && (
+                <div className="flex items-center gap-2 bg-[#1E2328] rounded-full px-3 py-1 border border-green-400">
+                  <span className="text-green-400 text-sm">
+                    {hand.pairType === "perfect"
+                      ? "Perfect Pair"
+                      : hand.pairType === "colored"
+                      ? "Colored Pair"
+                      : "Mixed Pair"}
+                  </span>
+                  <span className="text-white text-sm">
+                    {hand.pairType === "perfect"
+                      ? "25:1"
+                      : hand.pairType === "colored"
+                      ? "12:1"
+                      : "6:1"}
+                  </span>
+                </div>
+              )}
+
+              {/* 21+3 Result Display */}
+              {hand.twentyOnePlus3Hand && (
+                <div className="flex items-center gap-2 bg-[#1E2328] rounded-full px-3 py-1 border border-green-400">
+                  <span className="text-green-400 text-sm">
+                    {hand.twentyOnePlus3Hand === "suited-trips"
+                      ? "Suited Trips"
+                      : hand.twentyOnePlus3Hand === "straight-flush"
+                      ? "Straight Flush"
+                      : hand.twentyOnePlus3Hand === "three-of-a-kind"
+                      ? "Three of a Kind"
+                      : hand.twentyOnePlus3Hand === "straight"
+                      ? "Straight"
+                      : "Flush"}
+                  </span>
+                  <span className="text-white text-sm">
+                    {hand.twentyOnePlus3Hand === "suited-trips"
+                      ? "100:1"
+                      : hand.twentyOnePlus3Hand === "straight-flush"
+                      ? "40:1"
+                      : hand.twentyOnePlus3Hand === "three-of-a-kind"
+                      ? "30:1"
+                      : hand.twentyOnePlus3Hand === "straight"
+                      ? "10:1"
+                      : "5:1"}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         ))}

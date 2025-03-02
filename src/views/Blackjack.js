@@ -79,6 +79,9 @@ const Blackjack = () => {
   const startNewGame = () => {
     if (betAmount <= 0) return;
 
+    // Reset insurance bet
+    setInsuranceBet(0);
+
     // Deduct bets from balance
     const totalBet = betAmount + perfectPairsBet + twentyOnePlus3Bet;
     setBalance((prev) => prev - totalBet);
@@ -227,17 +230,44 @@ const Blackjack = () => {
         score: 0,
         result: null,
         payout: 0,
+        pairType: null,
+        pairPayout: 0,
+        twentyOnePlus3Hand: null,
+        twentyOnePlus3Payout: 0,
       },
       {
         cards: [currentHand.cards[1], game.dealCard()],
         score: 0,
         result: null,
         payout: 0,
+        pairType: null,
+        pairPayout: 0,
+        twentyOnePlus3Hand: null,
+        twentyOnePlus3Payout: 0,
       },
     ];
 
     newHands[0].score = game.calculateHandValue(newHands[0].cards);
     newHands[1].score = game.calculateHandValue(newHands[1].cards);
+
+    // Check for new pairs in the split hands
+    newHands[0].pairType = game.checkPairType(newHands[0].cards);
+    newHands[0].pairPayout = game.calculatePairPayout(
+      newHands[0].pairType,
+      perfectPairsBet
+    );
+
+    newHands[1].pairType = game.checkPairType(newHands[1].cards);
+    newHands[1].pairPayout = game.calculatePairPayout(
+      newHands[1].pairType,
+      perfectPairsBet
+    );
+
+    // Update balance with any new pair payouts
+    const totalNewPairPayout = newHands[0].pairPayout + newHands[1].pairPayout;
+    if (totalNewPairPayout > 0) {
+      setBalance((prev) => prev + totalNewPairPayout);
+    }
 
     setGameState((prev) => ({
       ...prev,
@@ -272,7 +302,7 @@ const Blackjack = () => {
       const result = calculateResult(hand.score, currentDealerScore);
       const multiplier = hand.cards.length === 3 ? 2 : 1; // Check if hand was doubled
       return {
-        ...hand,
+        ...hand, // Preserve all existing properties including side bet results
         result: result.result,
         payout: result.payout * multiplier,
       };
@@ -316,7 +346,7 @@ const Blackjack = () => {
       playerHands: prev.playerHands.map((hand, index) =>
         index === prev.currentHandIndex
           ? {
-              ...hand,
+              ...hand, // Preserve all existing properties including side bet results
               cards: newPlayerHand,
               score: newPlayerScore,
             }
@@ -339,7 +369,7 @@ const Blackjack = () => {
         playerHands: prev.playerHands.map((hand, index) =>
           index === prev.currentHandIndex
             ? {
-                ...hand,
+                ...hand, // Preserve all existing properties including side bet results
                 result: result.result,
                 payout: result.payout * 2, // Double the payout since it was a double down
               }
@@ -355,7 +385,7 @@ const Blackjack = () => {
     setInsuranceBet(insuranceAmount);
     setBalance((prev) => prev - insuranceAmount);
 
-    // Check if dealer has blackjack
+    // Check if dealer has blackjack (natural 21 with just 2 cards)
     const dealerHasBlackjack = game.isBlackjack(gameState.dealerHand);
 
     if (dealerHasBlackjack) {

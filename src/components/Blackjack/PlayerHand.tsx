@@ -1,6 +1,7 @@
 import React from "react";
 import Card from "./Card";
 import { motion } from "framer-motion";
+import { PairType, ThreeCardPokerHand } from "../../types/blackjack";
 
 interface PlayerHandProps {
   cards: Array<{
@@ -8,11 +9,13 @@ interface PlayerHandProps {
     value: string;
   }>;
   result?: "win" | "lose" | "push" | "blackjack" | null;
-  pairType?: "perfect" | "colored" | "mixed" | null;
+  pairType?: PairType;
   pairPayout?: number;
+  twentyOnePlus3Hand?: ThreeCardPokerHand;
+  twentyOnePlus3Payout?: number;
   isSmall?: boolean;
   gameId: number;
-  isActive?: boolean; // Add isActive prop
+  isActive?: boolean;
 }
 
 const PlayerHand: React.FC<PlayerHandProps> = ({
@@ -20,10 +23,13 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
   result,
   pairType,
   pairPayout,
+  twentyOnePlus3Hand,
+  twentyOnePlus3Payout,
   isSmall = false,
   gameId,
-  isActive = false, // Default to false
+  isActive = false,
 }) => {
+  // Keep these functions in case they're needed elsewhere
   const getPairTypeText = () => {
     if (!pairType) return null;
     switch (pairType) {
@@ -33,6 +39,24 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
         return "Colored Pair! (12:1)";
       case "mixed":
         return "Mixed Pair! (6:1)";
+      default:
+        return null;
+    }
+  };
+
+  const get21Plus3Text = () => {
+    if (!twentyOnePlus3Hand) return null;
+    switch (twentyOnePlus3Hand) {
+      case "suited-trips":
+        return "Suited Three of a Kind! (100:1)";
+      case "straight-flush":
+        return "Straight Flush! (40:1)";
+      case "three-of-a-kind":
+        return "Three of a Kind! (30:1)";
+      case "straight":
+        return "Straight! (10:1)";
+      case "flush":
+        return "Flush! (5:1)";
       default:
         return null;
     }
@@ -80,20 +104,6 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
           </motion.div>
         ))}
       </div>
-
-      {/* Pair Result Display */}
-      {pairType && (
-        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-          <div className="bg-[#1E2328] px-3 py-1 rounded-full text-sm">
-            <span className="text-white">{getPairTypeText()}</span>
-            {pairPayout && pairPayout > 0 && (
-              <span className="text-green-400 ml-2">
-                +{pairPayout.toFixed(8)} Ł
-              </span>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
